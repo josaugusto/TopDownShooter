@@ -13,6 +13,7 @@ function love.load()
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
     player.speed = 180
+    player.injured = false
 
     myFont = love.graphics.newFont(30)
 
@@ -43,16 +44,23 @@ function love.update(dt)
     end
 
     -- Zombies move toward the player
-    for _, zombie in ipairs(zombies) do
+    for i, zombie in ipairs(zombies) do
         zombie.x = zombie.x + (math.cos(zombiePlayerAngle(zombie)) * zombie.speed * dt)
         zombie.y = zombie.y + (math.sin(zombiePlayerAngle(zombie)) * zombie.speed * dt)
 
         if distanceBetween(zombie.x, zombie.y, player.x, player.y) < 28 then
-            for i,_ in ipairs(zombies) do
-                zombies[i] = nil
-                gameState = 1
-                player.x = love.graphics.getWidth() / 2
-                player.y = love.graphics.getHeight() / 2
+            if not player.injured then
+                zombie.dead = true
+                player.injured = true
+                player.speed = player.speed + 80
+            else
+                for i,_ in ipairs(zombies) do
+                    zombies[i] = nil
+                    gameState = 1
+                    player.x = love.graphics.getWidth() / 2
+                    player.y = love.graphics.getHeight() / 2
+                    player.injured = false
+                end
             end
         end
     end
@@ -115,8 +123,14 @@ function love.draw()
     end
     love.graphics.printf("Score: " .. score, 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), "center")
 
-    love.graphics.draw(sprites.player, player.x, player.y, playerMouseAngle(), 1, 1, sprites.player:getWidth()/2, sprites.player:getHeight()/2)
+    if not player.injured then
+        love.graphics.draw(sprites.player, player.x, player.y, playerMouseAngle(), 1, 1, sprites.player:getWidth()/2, sprites.player:getHeight()/2)
+    else
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.draw(sprites.player, player.x, player.y, playerMouseAngle(), 1, 1, sprites.player:getWidth()/2, sprites.player:getHeight()/2)
+    end
 
+    love.graphics.setColor(1, 1, 1)
     for i, zombie in ipairs(zombies) do
         love.graphics.draw(sprites.zombie, zombie.x, zombie.y, zombiePlayerAngle(zombie), 1, 1, sprites.zombie:getWidth()/2, sprites.zombie:getHeight()/2)
     end
