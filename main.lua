@@ -1,4 +1,7 @@
 function love.load()
+
+    windowWidth = love.graphics.getWidth()
+    windowHeight = love.graphics.getHeight()
     love.math.setRandomSeed(os.time())
 
     sprites = {}
@@ -8,8 +11,8 @@ function love.load()
     sprites.zombie = love.graphics.newImage("sprites/zombie.png")
 
     player = {}
-    player.x = love.graphics.getWidth() / 2
-    player.y = love.graphics.getHeight() / 2
+    player.x = windowWidth / 2
+    player.y = windowHeight / 2
     player.speed = 180
     player.injured = false
 
@@ -27,7 +30,7 @@ end
 function love.update(dt)
     if gameState == 2 then
         -- Player movement (WASD controls)
-        if love.keyboard.isDown('d') and player.x < love.graphics.getWidth() then
+        if love.keyboard.isDown('d') and player.x < windowWidth then
             player.x = player.x + player.speed*dt 
         end
         if love.keyboard.isDown('a') and player.x > 0 then
@@ -36,7 +39,7 @@ function love.update(dt)
         if love.keyboard.isDown('w') and player.y > 0 then
             player.y = player.y - player.speed*dt
         end
-        if love.keyboard.isDown('s') and player.y < love.graphics.getHeight() then
+        if love.keyboard.isDown('s') and player.y < windowHeight then
             player.y = player.y + player.speed*dt
         end
     end
@@ -58,8 +61,8 @@ function love.update(dt)
             end
             
             gameState = 1
-            player.x = love.graphics.getWidth() / 2
-            player.y = love.graphics.getHeight() / 2
+            player.x = windowWidth / 2
+            player.y = windowHeight / 2
             player.injured = false
             player.speed = 180
         end
@@ -74,7 +77,7 @@ function love.update(dt)
     -- Remove bullets that leave the screen
     for i = #bullets, 1, -1 do
         local bullet = bullets[i]
-        if bullet.x < 0 or bullet.y < 0 or bullet.x > love.graphics.getWidth() or bullet.y > love.graphics.getHeight() then
+        if bullet.x < 0 or bullet.y < 0 or bullet.x > windowWidth or bullet.y > windowHeight then
             table.remove(bullets, i)
         end
     end
@@ -131,7 +134,7 @@ function love.draw()
     end
 
     love.graphics.setColor(1, 1, 1)
-    for i, zombie in ipairs(zombies) do
+    for _, zombie in ipairs(zombies) do
         love.graphics.draw(sprites.zombie, zombie.x, zombie.y, zombiePlayerAngle(zombie), 1, 1, sprites.zombie:getWidth()/2, sprites.zombie:getHeight()/2)
     end
 
@@ -177,15 +180,15 @@ function spawnZombie()
     local side = math.random(1, 4)
     if side == 1 then
         zombie.x = -30
-        zombie.y = love.math.random(0, love.graphics.getHeight())
+        zombie.y = love.math.random(0, windowHeight)
     elseif side == 2 then
         zombie.x = love.graphics.getWidth() + 30
-        zombie.y = love.math.random(0, love.graphics.getHeight())
+        zombie.y = love.math.random(0, windowHeight)
     elseif side == 3 then
-        zombie.x = love.math.random(0, love.graphics.getWidth()) 
+        zombie.x = love.math.random(0, windowWidth) 
         zombie.y = -30
     elseif side == 4 then
-        zombie.x = love.math.random(0, love.graphics.getWidth())
+        zombie.x = love.math.random(0, windowWidth)
         zombie.y = love.graphics.getHeight() + 30
     end
 
