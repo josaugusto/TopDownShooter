@@ -1,15 +1,13 @@
 function love.load()
-    math.randomseed(os.time())
+    love.math.setRandomSeed(os.time())
 
     sprites = {}
-    
     sprites.background = love.graphics.newImage("sprites/background.png")
     sprites.player = love.graphics.newImage("sprites/player.png")
     sprites.bullet = love.graphics.newImage("sprites/bullet.png")
     sprites.zombie = love.graphics.newImage("sprites/zombie.png")
 
     player = {}
-
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
     player.speed = 180
@@ -47,21 +45,23 @@ function love.update(dt)
     for i, zombie in ipairs(zombies) do
         zombie.x = zombie.x + (math.cos(zombiePlayerAngle(zombie)) * zombie.speed * dt)
         zombie.y = zombie.y + (math.sin(zombiePlayerAngle(zombie)) * zombie.speed * dt)
+  
+        local isColliding = distanceBetween(zombie.x, zombie.y, player.x, player.y) < 28
 
-        if distanceBetween(zombie.x, zombie.y, player.x, player.y) < 28 then
-            if not player.injured then
-                zombie.dead = true
-                player.injured = true
-                player.speed = player.speed + 80
-            else
-                for i,_ in ipairs(zombies) do
-                    zombies[i] = nil
-                    gameState = 1
-                    player.x = love.graphics.getWidth() / 2
-                    player.y = love.graphics.getHeight() / 2
-                    player.injured = false
-                end
+        if isColliding and not player.injured then
+            zombie.dead = true
+            player.injured = true
+            player.speed = player.speed + 80
+        elseif isColliding and player.injured then
+            for i = #zombies, 1, -1 do
+               zombies[i] = nil
             end
+            
+            gameState = 1
+            player.x = love.graphics.getWidth() / 2
+            player.y = love.graphics.getHeight() / 2
+            player.injured = false
+            player.speed = 180
         end
     end
 
@@ -177,15 +177,15 @@ function spawnZombie()
     local side = math.random(1, 4)
     if side == 1 then
         zombie.x = -30
-        zombie.y = math.random(0, love.graphics.getHeight())
+        zombie.y = love.math.random(0, love.graphics.getHeight())
     elseif side == 2 then
         zombie.x = love.graphics.getWidth() + 30
-        zombie.y = math.random(0, love.graphics.getHeight())
+        zombie.y = love.math.random(0, love.graphics.getHeight())
     elseif side == 3 then
-        zombie.x = math.random(0, love.graphics.getWidth()) 
+        zombie.x = love.math.random(0, love.graphics.getWidth()) 
         zombie.y = -30
     elseif side == 4 then
-        zombie.x = math.random(0, love.graphics.getWidth())
+        zombie.x = love.math.random(0, love.graphics.getWidth())
         zombie.y = love.graphics.getHeight() + 30
     end
 
